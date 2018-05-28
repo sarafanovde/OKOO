@@ -142,7 +142,7 @@ namespace ConsoleTest
             }
             SW.Stop(); //Останавливаем
             
-            Console.WriteLine("Время исполнения" + Convert.ToString(SW.Elapsed.Seconds));
+            Console.WriteLine("Время исполнения " + Convert.ToString(SW.Elapsed.Seconds));
             excelApp.Quit();
 
             Console.ReadKey();
