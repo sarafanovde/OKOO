@@ -33,6 +33,7 @@ namespace ClassLibrary
 
         public AuditIncident audit;
         public ProtocolIncident protocol;
+        public string BadProtocol = "1";
 
         public Incident(string number, string solution, bool k2, bool unlawfulk2)
         {

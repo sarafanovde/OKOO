@@ -14,14 +14,12 @@ namespace ConsoleTest
     {
         static void Main(string[] args)
         {
-            CheckForCorrectWords checher = new CheckForCorrectWords();
-            MinWordSolution min = new MinWordSolution();
-            CheckCasp caps = new CheckCasp();
+            
             List<Incident> ims = new List<Incident> ();
 
             Excel.Application excelApp = new Excel.Application();
             excelApp.Visible = true;
-            excelApp.Workbooks.Open(@"C:\excel.xlsx");
+            excelApp.Workbooks.Open(@"C:\incident.xlsx");
           
             Excel.Worksheet currentSheet = (Excel.Worksheet)excelApp.Workbooks[1].Worksheets[1];
             int iLastRow = currentSheet.Cells[currentSheet.Rows.Count, "A"].End[Excel.XlDirection.xlUp].Row;  //последняя заполненная строка в столбце А
@@ -30,7 +28,7 @@ namespace ConsoleTest
 
             for (int i = 2; i<=iLastRow; i++)
             {
-                ims.Add(new Incident(arrData[i,1].ToString(), arrData[i,4].ToString(), false, false));
+                ims.Add(new Incident(arrData[i, 1].ToString(), arrData[i, 4].ToString(), false, false));
             }
             
 
@@ -64,7 +62,7 @@ namespace ConsoleTest
             if (im != null)
                 im.audit = temp;
 
-            excelApp.Workbooks.Open(@"C:\protocol.xls");
+            excelApp.Workbooks.Open(@"C:\protocol.xlsx");
             currentSheet = (Excel.Worksheet)excelApp.Workbooks[3].Worksheets[1];
             iLastRow = currentSheet.Cells[currentSheet.Rows.Count, "A"].End[Excel.XlDirection.xlUp].Row;  //последняя заполненная строка в столбце А
             arrData = (object[,])currentSheet.Range["A1:O" + iLastRow].Value;
@@ -92,35 +90,53 @@ namespace ConsoleTest
             if (im != null)
                 im.protocol = tempprotocol;
 
+            excelApp.Workbooks.Open(@"C:\CAPS.xlsx");
+            currentSheet = (Excel.Worksheet)excelApp.Workbooks[4].Worksheets[1];
+            iLastRow = currentSheet.Cells[currentSheet.Rows.Count, "A"].End[Excel.XlDirection.xlUp].Row;  //последняя заполненная строка в столбце А
+            arrData = (object[,])currentSheet.Range["A1:O" + iLastRow].Value;
+            List<string> CapsException = new List<string>();
+
+            for (int i = 1; i <= iLastRow; i++)
+            {
+                CapsException.Add(arrData[i, 1].ToString());
+            }
+
             excelApp.Workbooks.Open(@"C:\result.xlsx");
 
-            currentSheet = (Excel.Worksheet)excelApp.Workbooks[4].Worksheets[1];
+            currentSheet = (Excel.Worksheet)excelApp.Workbooks[5].Worksheets[1];
 
             int k = 1;
+            
+            CheckCasp caps = new CheckCasp(CapsException);
+            CheckForCorrectWords checher = new CheckForCorrectWords();
+            MinWordSolution min = new MinWordSolution();
+
             Stopwatch SW = new Stopwatch(); // Создаем объект
             SW.Start(); // Запускаем
-            foreach (var im1 in ims)
+            for (int i = 0; i < ims.Count(); i++)
             {
-                //Console.WriteLine(im.Number);
-                //Console.WriteLine(im.Solution);
-                checher.SetDataIncident(im1);
-                min.SetDataIncident(im1);
-                var cps = caps.GetResult(im1);
-                var differences = im1.audit.CheckFirstRequest();
+                Incident inc = ims[i];
+                checher.SetDataIncident(ims[i]);
+                min.SetDataIncident(ims[i]);
+                var cps = caps.GetResult(ims[i]);
+                var differences = ims[i].audit.CheckFirstRequest();
+                var capsProt = caps.GetResultProtocol(ims[i]);
+                var checkCorrectWordsProt = checher.GetResultProtocol();
                 string result = "";
                 foreach (var x in differences)
                 {
                     result += x.ToString();
                 }
-
-                currentSheet.Cells[k, 1] = im1.Number; 
-                currentSheet.Cells[k, 2] = im1.Solution;
-                currentSheet.Cells[k, 3] = "есть плохие слова " + checher.GetResult();
-                currentSheet.Cells[k, 4] = "больше 10 слов " + min.GetResult();
-                currentSheet.Cells[k, 5] = "слова капсом " + cps;
-                currentSheet.Cells[k, 6] = "Отклонения в минутах по аудиту" + result;
-                currentSheet.Cells[k, 7] = "плохие слова в протоколе" + checher.GetResultProtocol();
-                currentSheet.Cells[k, 8] = "меньше трех слов" + min.GetResultForProtocol();
+                currentSheet.Cells[k, 1] = ims[i].Number; 
+                currentSheet.Cells[k, 2] = ims[i].Solution;
+                currentSheet.Cells[k, 3] = ims[i].BadProtocol;
+                currentSheet.Cells[k, 4] = checher.GetResult();
+                currentSheet.Cells[k, 5] = "больше 10 слов " + min.GetResult();
+                currentSheet.Cells[k, 6] = "слова капсом " + cps;
+                currentSheet.Cells[k, 7] = "Запрос информации по аудиту" + result;
+                currentSheet.Cells[k, 8] = checkCorrectWordsProt;
+                currentSheet.Cells[k, 9] = "меньше трех слов" + min.GetResultForProtocol();
+                currentSheet.Cells[k, 10] = "слова капсом в протоколе" + capsProt;
 
                 k++;
             }

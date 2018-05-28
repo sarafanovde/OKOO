@@ -26,9 +26,10 @@ namespace ClassLibrary
 
         public bool GetResultForProtocol()
         {
-            foreach (var x in im.protocol.Protocol)
+            if (im.protocol != null)
+                foreach (var x in im.protocol.Protocol)
             {
-                if (MoreLess.CheckLess(x.Comments, 3))
+                if (MoreLess.CheckLess(x.Comments, 3) && x.Type != "Сообщение инженеру")
                 {
                     return true;
                 }

@@ -12,7 +12,7 @@ namespace ClassLibrary
         // Метод вернет true если число слов больше числа num
         public static bool CheckMore(string text, int num)
         {
-            String [] result = text.Split(' ');
+            var result = text.Split(new[] { ' ', '\n', '!', '?', '.', ',', ':' }, StringSplitOptions.RemoveEmptyEntries);
             if (result.Count() >= num)
                 return true;
             else
@@ -21,7 +21,7 @@ namespace ClassLibrary
         // Метод вернет true если число слов менее числа num
         public static bool CheckLess(string text, int num)
         {
-            String[] result = text.Split(' ');
+            var result = text.Split(new[] { ' ', '\n', '!', '?', '.', ',', ':' }, StringSplitOptions.RemoveEmptyEntries);
             if (result.Count() <= num)
                 return true;
             else

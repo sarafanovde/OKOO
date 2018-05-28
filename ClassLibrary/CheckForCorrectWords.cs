@@ -46,7 +46,7 @@ namespace ClassLibrary
         public string GetResultProtocol()
         {
             var result = "";
-            
+            if (im.protocol != null)
             foreach (var protocol in im.protocol.Protocol)
             {
                 var wors = protocol.Comments.Split(' ');
@@ -55,21 +55,29 @@ namespace ClassLibrary
                 {
                     foreach (string k in wors)
                         if (k.ToLower() == x.ToLower())
+                        {
                             result = result + "" + x;
+                            im.BadProtocol = im.BadProtocol + protocol.Comments;
+                        }
 
                 }
             }
             List<string> badSign = new List<string> { "!!", "??", "!?", "?!", "..." };
+            if (im.protocol != null)
             foreach (var protocol in im.protocol.Protocol)
             {
-                var wors = protocol.Comments;
-                foreach (var x in badSign)
-                {
-                    if (kmp.KMP_algo(x, wors))
+                    if (protocol.Type != "Сообщение инженеру")
                     {
-                        result = result + " " + x;
+                        var wors = protocol.Comments;
+                        foreach (var x in badSign)
+                        {
+                            if (kmp.KMP_algo(x, wors))
+                            {
+                                result = result + " " + x;
+                                im.BadProtocol = im.BadProtocol + protocol.Comments;
+                            }
+                        }
                     }
-                }
             }
             return result;
         }
